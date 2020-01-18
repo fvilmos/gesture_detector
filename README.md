@@ -23,7 +23,7 @@ The project presents a full solution for capturing, retraining and classifieing 
 </h1>
 </table>
 
-The flow of the detection and classifications, starts with low level filtering (sik color detector), followed by a contour selector. The role of the contour selector is to identify the regions of interest (ROI) where the object for classification can be found. Image patches like below are collected and stored in directories for a database creation. Images are normalized before saveings, to otain better detection performance.
+The flow of the detection and classifications, starts with low level filtering (skin color detector), followed by a contour selector. The role of the contour selector is to identify the regions of interest (ROI) where the object for classification can be found. Image patches like below are collected and stored in directories for a database creation. Images are normalized before saveings, to obtain better detection performance.
 <table>
 <h1 align="left">
 <tr>
@@ -89,7 +89,7 @@ optional arguments:
 1. Create directory structure to store the files
 2. Create labels file
 3. Capture and copy files under the desired folders
-4. Intruct software for retrain
+4. Instruct software for retrain
 ```
 #### 1. Create directory structure
 
@@ -111,7 +111,7 @@ Is recommandet to start from the root of the python file, and create a directory
 ```
 #### 2. Create labels file
 
-The tool itself provide means for saving region images, this is fitting to the needs. First we need the label file, then the rest is easy.
+The tool itself provide means for saving image regions, this is fitting to the needs. First we need the label file, then the rest is easy.
 ```
 python3 ./gesture_detector.py -l ./labels.txt -cmd creatlabelfile -dir ./data
 ```
@@ -140,15 +140,15 @@ Use the following command to save images into a temp directory:
 python3 ./gesture_detector.py -l ./labels.txt -t -dd ./data/tmp -sf 1 -sp 1
 ```
 This will capture regions for detection, and the frames on which the regions were detected. If just patches are needed use just -sp 1 command.
-Now, comes the hard work of selectiong and coping the soecific image patches under the desired directory.
+Now, comes the hard work of selectiong and coping the specific image patches under the desired directorys.
 
-#### 4. Intruct software for retrain
+#### 4. Instruct software for retrain
 
 Use the following command for retrain:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml -cmd retrain
 ```
-When everithing has gone well with the rettrain, the software starts automatically. The data.xml will be automatically saved, threfore for nex run only:
+When everithing has gone well with the retrain, the software starts automatically. The data.xml will be automatically saved, threfore for nex run only:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml
 ```
