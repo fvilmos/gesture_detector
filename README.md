@@ -23,7 +23,7 @@ The project presents a full solution for capturing, retraining and classifieing 
 </h1>
 </table>
 
-The flow of the detection and classifications, starts with low level filtering (skin color detector), followed by a contour selector. The role of the contour selector is to identify the regions of interest (ROI) where the object for classification can be found. Image patches like below are collected and stored in directories for a database creation. Images are normalized before saveings, to obtain better detection performance.
+The flow of the detection and classifications, starts with low level filtering (skin color detector), followed by a contour selector. Role of the contour selector is to identify the regions of interest (ROI) where the object for classification can be found. Image patches like below are collected and stored in directories for a database creation. Images are normalized before saveings, to obtain better detection performance.
 <table>
 <h1 align="left">
 <tr>
@@ -55,7 +55,7 @@ The flow of the detection and classifications, starts with low level filtering (
 </h1>
 </table>
 
-After createing a sufficiently big database ~100 pictures / class, the SVM training can start. Will take only a few secounds and an xml file will be saved which holds everrything needed for further detections.
+After createing a sufficiently big database ~100 pictures / class, the SVM training can start. Will take only a few secounds and a xml file will be saved which holds everrything needed for further detections.
 
 
 ## Usage
@@ -118,7 +118,7 @@ python3 ./gesture_detector.py -l ./labels.txt -cmd creatlabelfile -dir ./data
 Now, label file was created, contect is somethng like this:
 
 ```
-1,_2,/home/vfe/PycharmProjects/test/data/_2
+#1,_2,/home/vfe/PycharmProjects/test/data/_2
 2,5,/home/vfe/PycharmProjects/test/data/5
 3,face,/home/vfe/PycharmProjects/test/data/face
 4,2,/home/vfe/PycharmProjects/test/data/2
@@ -148,10 +148,20 @@ Use the following command for retrain:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml -cmd retrain
 ```
-When everithing has gone well with the retrain, the software starts automatically. The data.xml will be automatically saved, threfore for nex run only:
+When everithing has gone well with the re-train, the software starts automatically. The data.xml will be automatically saved, threfore for nex run only:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml
 ```
+
+### Tweeking the object detector
+
+Detection performace is mainly driven by the color filterer. Different skin tones or even changing the object traced, can be easily setted, in the folowing code section:
+```
+# pre-processing
+objPP = clPreProcessing(img0, False, 155, 30, 100)
+```
+There is a simple tool to obtain desired color, [try this out](https://github.com/fvilmos/color_filterer).
+
 
 ### Future work
 
