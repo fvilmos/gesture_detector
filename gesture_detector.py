@@ -7,6 +7,7 @@ import os
 from utils import clPreProcessing
 from utils import clTraningSetManager
 from utils import ContourDetector
+from utils import clAutoCalibrate
 
 
 class clHogDetector:
@@ -226,7 +227,6 @@ class clHogDetector:
         '''
         self.svm.save(fn)
 
-
 # main loop
 if __name__ == "__main__":
 
@@ -252,6 +252,9 @@ if __name__ == "__main__":
                         help='save original camera frames, [0,1] default=0')
     parser.add_argument('-sp', type=int, required=False, metavar='savepatches', default=0, choices=[0,1],
                         help='save image detections (patches), [0,1] default=0')
+
+    parser.add_argument('-cal', type=int, required=False, metavar='calibration', default=0, choices=[0,1],
+                        help='reclalibrate skin color detection, [0,1] default=0')
 
     args = parser.parse_args()
     cmd = args.choises
@@ -283,7 +286,8 @@ if __name__ == "__main__":
     imgd = np.zeros([IMG_HEIGHT, IMG_WIDTH, 3], dtype=np.uint8)
 
     # pre-processing
-    objPP = clPreProcessing(img0, False, 155, 30, 100)
+    #objPP = clPreProcessing(img0, False, 155, 30, 100)
+    objPP = clPreProcessing(img0, False, 150, 66, 66)
 
     # contour detector
     cd = ContourDetector()
@@ -291,6 +295,14 @@ if __name__ == "__main__":
     # object for data set handling
     tsm = clTraningSetManager()
 
+    # skin color autocalibration
+    ac = clAutoCalibrate()
+
+
+    if args.cal == 1:
+        #load calibration values from a file
+        val = tsm.LoadLabelsFile(labelfile,True)
+        objPP.SetColorFilteringThresholds(int(val[0]), int(val[1]), int(val[2]))
 
     if cmd == 'run':
         if labelfile is None:
@@ -367,14 +379,16 @@ if __name__ == "__main__":
             img = objPP.processImg1(img)
             aa = cd.CotourFilter(img,500.0)
 
-
             rois = cd.GetRoiForDetections(img0,aa,0)
 
             imgd = np.zeros([IMG_HEIGHT, IMG_WIDTH, 3],dtype=np.uint8)
             imgd = cd.ShowRoisOnImage(imgd,rois)
 
             val = det.ClassifyRoi(rois, SAMPLESIZE)
-            img = cd.DrawDetections(img0, aa, 0, True, True, val)
+            if args.cal is 0:
+                img = cd.DrawDetections(img0, aa, 0, True, True, val)
+            else:
+                img = ac.RunCalibration(img0)
 
             if detectionsdir is not None:
                 if args.sp == 1:
@@ -387,13 +401,28 @@ if __name__ == "__main__":
                     cd.SaveImages(img0, [], detectionsdir,prefix="sf_")
 
             cv2.imshow('img', img)
+            #cv2.imshow('imgx',imgx)
             if args.d == 1:
                 cv2.imshow('imgd', imgd)
 
-        # quit on keypress
+
         k = cv2.waitKey(1) & 0xFF
+
+        # quit on keypress
         if k == ord('q'):
           break
+
+        # calibrate
+        if k == ord('c'):
+            if args.cal is not 0:
+                # save calibration values
+                val = ac.ProvideClaibParams()
+                objPP.SetColorFilteringThresholds(int(val[0]), int(val[1]), int(val[2]))
+
+                tsm.SaveCalibration(labelfile, val)
+
+                #exit
+                break
 
     # release cam
     cam0.release()

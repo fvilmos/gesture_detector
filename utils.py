@@ -27,7 +27,25 @@ class clPreProcessing():
     def nothing(self,x):
         pass
 
+    def SetColorFilteringThresholds(self, h,s,v):
+        '''
+        Set the new hue, saturation, value from HSV color space
+        :param h: new hue value from HSV space
+        :param s: new saturation rom HSV space
+        :param v: new value from HSV space
+        :return:
+        '''
+
+        self.h = h
+        self.s = s
+        self.v = v
+
     def processImg(self, img):
+        '''
+
+        :param img: input img
+        :return: processed img
+        '''
 
         if self.debug == True:
             self.h = cv2.getTrackbarPos('h', 'img')
@@ -51,6 +69,11 @@ class clPreProcessing():
         return self.img
 
     def processImg1(self, img):
+        '''
+        Prost processing for image
+        :param img: input image
+        :return: processed image
+        '''
 
         kernel = np.ones((5, 5), np.uint8)
         # smooth the image
@@ -58,14 +81,9 @@ class clPreProcessing():
 
         self.img = cv2.dilate(self.img, kernel, iterations=7)
 
-
         self.img = cv2.morphologyEx(self.img, cv2.MORPH_CLOSE, kernel)
 
-
-
         return self.img
-
-
 
 ###############################################################################
 #Provide easy access functions to create / save / load labels and training sets
@@ -125,8 +143,35 @@ class clTraningSetManager():
             pass
         file.close()
 
+    def SaveCalibration(self,labelfile,calval=[]):
+        '''
+        Add calibration values to label file
+        :param labelfile: label file
+        :return: none
+        '''
 
-    def LoadLabelsFile(self, file):
+        #read all file
+        with open(labelfile, "r") as f:
+            lines = f.readlines()
+
+        # write lines without calibration values
+        with open(labelfile, "w") as f:
+            for line in lines:
+                if line.find('#cal,') == -1:
+                    f.write(line)
+
+        #add to the end the values
+        with open(labelfile, "a") as f:
+            h = str(calval[0])
+            s = str(calval[1])
+            v = str(calval[2])
+            ws = str(h + ","+ s +"," + v)
+            f.write("#cal," + ws)
+
+
+
+
+    def LoadLabelsFile(self, file,calibration=False):
         '''
         :param file: name of the labels file
         :return: array of unique identifier, dir name as label, dir names
@@ -135,10 +180,20 @@ class clTraningSetManager():
         lf = []
         with open(file) as fp:
             for cnt, line in enumerate(fp):
-                # split data, skip what if needed
-                if line.find('#') == -1:
-                    res = [x.strip() for x in line.split(',')]
-                    lf.append(res)
+                if calibration == False:
+                    # split data, skip what if needed
+                    if line.find('#') == -1:
+                        res = [x.strip() for x in line.split(',')]
+                        lf.append(res)
+                else:
+                    if line.find('#cal,') != -1:
+                        #get calibration values
+                        res = [x.strip() for x in line.split(',')]
+                        h = res[1]
+                        s = res[2]
+                        v = res[3]
+                        lf = np.array([h,s,v])
+
         return lf
 
     def GetItemsByPosition(self,labellist, id=1):
@@ -150,6 +205,9 @@ class clTraningSetManager():
 
         return [i[id] for i in labellist]
 
+###############################################################################
+# Get contours of a pre-processed image
+###############################################################################
 class ContourDetector():
     def __init__(self):
         self.gimg = []
@@ -281,3 +339,38 @@ class ContourDetector():
                 self.count +=1
         else:
             cv2.imwrite(path + "img_"+ prefix + str(time) + ".png", img)
+
+
+class clAutoCalibrate:
+    def __init__(self):
+        self.img = []
+        self.h = 0
+        self.s = 0
+        self.v = 0
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+
+    def ProvideClaibParams(self):
+        return (self.h,self.s,self.v)
+
+    def RunCalibration(self, img):
+
+        x = 10; y = 10;
+        w = 80 ; h = 80;
+
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        img = cv2.rectangle(img, ( 8, 8), (90, 90), (0, 255, 0), 2)
+
+        detRoi = hsv[y:y + h, x:x + w]
+
+        channels = cv2.split(detRoi)
+
+        self.h = int(np.average(np.array(channels[0])))
+        self.s = int(np.average(np.array(channels[1])))
+        self.v = int(np.average(np.array(channels[2])))
+
+        img[10:90,10:90] = detRoi
+        msg = "hsv=" + str(self.h)+"," + str(self.s)+"," + str(self.v)
+        cv2.putText(img,msg, (5,105), self.font, 0.4, (0, 255, 0), 1,cv2.LINE_AA)
+
+        return img
