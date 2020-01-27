@@ -164,6 +164,25 @@ objPP = clPreProcessing(img0, False, 155, 30, 100)
 ```
 There is a simple tool to obtain desired color, [try this out](https://github.com/fvilmos/color_filterer).
 
+### (Re) Calibrate
+
+In some cases skeen color detector does not provide consistent detection. Re- calibration could be the solution. Values are stored in the labels file. Tustart the calibration process invoke the pithon file with the following arguments:
+```
+python3 ./gesture_detector.py -l ./labels.txt -t data.xml -cal 1
+
+```
+A small calibration window will appear, the object with the desired color to be detected shall be placed to cover the full window. On real time the HSV calibration values will be dispeayed, if the values are stabilized, press "c" button from the keyboard
+<table>
+<h1 align="left">
+<tr>
+  <th>
+  <a name="flower" href=""><img src="./images/calibration.png" alt="400" width="400"></a>
+  </th>
+</tr>
+</h1>
+</table>
+If all vent good, the new values are stored in labels file, and the application closes automatically.
+
 
 ### Future work
 
