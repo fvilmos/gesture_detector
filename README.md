@@ -66,7 +66,7 @@ usage: gesture_detector.py [-h] -l labelfile [-t trainedfile] [-cmd commands]
                            [-d detectionswindow] [-c cameraid] [-s samplesize]
                            [-dir traindirectory] [-dd detectiondir]
                            [-ani annotatedimages] [-sf saveframe]
-                           [-sp savepatches]
+                           [-sp savepatches] [-cal calibration]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -83,6 +83,8 @@ optional arguments:
   -ani annotatedimages  save annotated images, [0,1] default=0
   -sf saveframe         save original camera frames, [0,1] default=0
   -sp savepatches       save image detections (patches), [0,1] default=0
+  -cal calibration      reclalibrate skin color detection, [0,1] default=0
+
 ```
 ### Retrain
 ```
