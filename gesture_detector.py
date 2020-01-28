@@ -286,7 +286,6 @@ if __name__ == "__main__":
     imgd = np.zeros([IMG_HEIGHT, IMG_WIDTH, 3], dtype=np.uint8)
 
     # pre-processing
-    #objPP = clPreProcessing(img0, False, 155, 30, 100)
     objPP = clPreProcessing(img0, False, 150, 66, 66)
 
     # contour detector
