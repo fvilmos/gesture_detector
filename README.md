@@ -120,17 +120,17 @@ python3 ./gesture_detector.py -l ./labels.txt -cmd creatlabelfile -dir ./data
 Now, label file was created, contect is somethng like this:
 
 ```
-#1,_2,/home/vfe/PycharmProjects/test/data/_2
-2,5,/home/vfe/PycharmProjects/test/data/5
-3,face,/home/vfe/PycharmProjects/test/data/face
-4,2,/home/vfe/PycharmProjects/test/data/2
-5,ok,/home/vfe/PycharmProjects/test/data/ok
-#6,tmp,/home/vfe/PycharmProjects/test/data/tmp
-7,4,/home/vfe/PycharmProjects/test/data/4
-8,0,/home/vfe/PycharmProjects/test/data/0
-9,1,/home/vfe/PycharmProjects/test/data/1
-10,halt,/home/vfe/PycharmProjects/test/data/halt
-11,3,/home/vfe/PycharmProjects/test/data/3
+#1,_2,/home/test/data/_2
+2,5,/home/test/data/5
+3,face,/home/test/data/face
+4,2,/home/test/data/2
+5,ok,/home/test/data/ok
+#6,tmp,/home/test/data/tmp
+7,4,/home/test/data/4
+8,0,/home/test/data/0
+9,1,/home/test/data/1
+10,halt,/home/test/data/halt
+11,3,/home/test/data/3
 ```
 
 Unneeded directoryes like "tmp" - used to store temporary images, can be commented, the label loader will skip it. The format is simple, first element is the UID (unique identifier), label name - edit it to whatever want to show on detections. Last is the directory for the specific label.
