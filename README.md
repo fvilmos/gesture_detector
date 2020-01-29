@@ -181,7 +181,7 @@ A small calibration window will appear, the object with the desired color to be 
 </tr>
 </h1>
 </table>
-If all vent good, the new values are stored in labels file, and the application closes automatically.
+If all vent good, the new values are stored in labels file, and the application will close automatically.
 
 
 ### Future work
