@@ -374,8 +374,8 @@ if __name__ == "__main__":
         # test cam instances
         if (cam0):
 
-            img = objPP.processImg(img0)
-            img = objPP.processImg1(img)
+            img = objPP.processHSV(img0)
+            img = objPP.processFilter(img)
             aa = cd.CotourFilter(img,500.0)
 
             rois = cd.GetRoiForDetections(img0,aa,0)

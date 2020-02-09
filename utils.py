@@ -3,6 +3,7 @@ import numpy as np
 import os
 from datetime import datetime
 
+
 ###########################################################
 # With help of this class the correct HSV values ca be
 # selected from a picture color space
@@ -11,64 +12,101 @@ from datetime import datetime
 ###########################################################
 class clPreProcessing():
 
-    def __init__(self,img, debug=True, h=122,s=22,v=0):
+    def __init__(self,img, debug=True, hmin=77,smin=133,vmin=27, hmax=189,smax=170,vmax=153):
+        '''
+        Set the new hue, saturation, value from a color space
+        :param hmin: new value
+        :param smin: new value
+        :param vmin: new value
+        :param hmax: new value
+        :param smax: new value
+        :param vmax: new value
+        :return: processed image
+        '''
         self.img = img
         self.debug = debug
-        self.h = h
-        self.s = s
-        self.v = v
+        self.hmin = hmin
+        self.smin = smin
+        self.vmin = vmin
+        self.hmax = hmax
+        self.smax = smax
+        self.vmax = vmax
 
-        if self.debug == True:
+        if self.debug:
             # create trackbars for color change
-            cv2.createTrackbar('h', 'img', 0, 255, self.nothing)
-            cv2.createTrackbar('s', 'img', 0, 255, self.nothing)
-            cv2.createTrackbar('v', 'img', 0, 255, self.nothing)
+            self.hmin = cv2.createTrackbar('hmin', 'img',hmin,255, self.nothing)
+            self.smin = cv2.createTrackbar('smin', 'img',smin,255, self.nothing)
+            self.vmin = cv2.createTrackbar('vmin', 'img',vmin,255, self.nothing)
+            self.hmax = cv2.createTrackbar('hmax', 'img',hmax,255, self.nothing)
+            self.smax = cv2.createTrackbar('smax', 'img',smax,255, self.nothing)
+            self.vmax = cv2.createTrackbar('vmax', 'img',vmax,255, self.nothing)
 
     def nothing(self,x):
         pass
 
-    def SetColorFilteringThresholds(self, h,s,v):
+    def SetColorFilteringThresholds(self, hmin,smin,vmin,hmax,smax,vmax):
         '''
-        Set the new hue, saturation, value from HSV color space
-        :param h: new hue value from HSV space
-        :param s: new saturation rom HSV space
-        :param v: new value from HSV space
-        :return:
+        Set the new hue, saturation, value from a color space
+        :param hmin: new value
+        :param smin: new value
+        :param vmin: new value
+        :param hmax: new value
+        :param smax: new value
+        :param vmax: new value
+        :return: processed image
         '''
+        self.hmin = hmin
+        self.smin = smin
+        self.vmin = vmin
+        self.hmax = hmax
+        self.smax = smax
+        self.vmax = vmax
 
-        self.h = h
-        self.s = s
-        self.v = v
-
-    def processImg(self, img):
+    def processHSV(self, img,rmask=False,val=[0,100,0,20,255,255,135,31,18,180,255,255]):
         '''
 
         :param img: input img
+        :param rmask return just image mask
+        :param val holds the init values for the color pace
         :return: processed img
         '''
 
         if self.debug == True:
-            self.h = cv2.getTrackbarPos('h', 'img')
-            self.s = cv2.getTrackbarPos('s', 'img')
-            self.v = cv2.getTrackbarPos('v', 'img')
+            self.hmin = cv2.getTrackbarPos('hmin', 'img')
+            self.smin = cv2.getTrackbarPos('smin', 'img')
+            self.vmin = cv2.getTrackbarPos('vmin', 'img')
+            self.hmax = cv2.getTrackbarPos('hmax', 'img')
+            self.smax = cv2.getTrackbarPos('smax', 'img')
+            self.vmax = cv2.getTrackbarPos('vmax', 'img')
 
-        # smooth the image
-        self.img = cv2.medianBlur(img, 7)
-        self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
+        self.img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-        # set colr space domain
-        lower_skin = np.array([self.h, self.s, self.v])
-        upper_skin = np.array([self.h + 80, 255, 255])
+        lower_skin = np.array([val[0],val[1],val[2]])
+        upper_skin = np.array([val[3],val[4],val[5]])
 
-        # filter HSV image
-        mask = cv2.inRange(self.img, lower_skin, upper_skin)
+        mask1 = cv2.inRange(self.img,lower_skin,upper_skin)
+
+        lower_skin = np.array([val[6],val[7],val[8]])
+        upper_skin = np.array([val[9],val[10],val[11]])
+
+        mask2 = cv2.inRange(self.img, lower_skin, upper_skin)
+
+        mask = cv2.bitwise_or(mask1,mask2)
+
+        kernel = np.ones((3, 3), np.uint8)
+        kernel1 = np.ones((5, 5), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel1)
 
         # apply mask on the original image
         self.img = cv2.bitwise_and(img, img, mask=mask)
 
+        if rmask:
+            self.img = mask
+
         return self.img
 
-    def processImg1(self, img):
+    def processFilter(self, img):
         '''
         Prost processing for image
         :param img: input image
@@ -77,13 +115,81 @@ class clPreProcessing():
 
         kernel = np.ones((5, 5), np.uint8)
         # smooth the image
-        self.img = cv2.medianBlur(img, 11)
+        self.img = cv2.medianBlur(img, 7)
 
-        self.img = cv2.dilate(self.img, kernel, iterations=7)
+        self.img = cv2.dilate(self.img, kernel, iterations=5)
 
-        self.img = cv2.morphologyEx(self.img, cv2.MORPH_CLOSE, kernel)
+        self.img = cv2.morphologyEx(self.img, cv2.MORPH_ELLIPSE, kernel)
 
         return self.img
+
+    def processYCrBr(self, img, rmask=False,val=[27,133,28,135,167,145,13,38,20,37,22,12]):
+        '''
+
+        :param img: input img
+        :param rmask return just image mask
+        :param val holds the init values for the color pace
+        :return: processed img
+        '''
+
+        if self.debug == True:
+            self.hmin = cv2.getTrackbarPos('hmin', 'img')
+            self.smin = cv2.getTrackbarPos('smin', 'img')
+            self.vmin = cv2.getTrackbarPos('vmin', 'img')
+            self.hmax = cv2.getTrackbarPos('hmax', 'img')
+            self.smax = cv2.getTrackbarPos('smax', 'img')
+            self.vmax = cv2.getTrackbarPos('vmax', 'img')
+
+        self.img = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
+
+        lower_skin = np.array([val[0],val[1],val[2]])
+        upper_skin = np.array([val[3],val[4],val[5]])
+
+        mask1 = cv2.inRange(self.img,lower_skin,upper_skin)
+
+        lower_skin = np.array([val[6],val[7],val[8]])
+        upper_skin = np.array([val[9],val[10],val[11]])
+
+        mask2 = cv2.inRange(self.img, lower_skin, upper_skin)
+
+        mask = cv2.bitwise_or(mask1,mask2)
+
+        kernel = np.ones((3, 3), np.uint8)
+        kernel1 = np.ones((5, 5), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel1)
+
+        # apply mask on the original image
+        self.img = cv2.bitwise_and(self.img, self.img, mask=mask)
+
+        if rmask:
+            self.img = mask
+
+        return self.img
+
+    def CombineDetections(self, img):
+        '''
+
+        :param img:
+        :return: combined HSV and yCrCb skin color detection
+        '''
+
+        #get hsv mask
+        hsvm = self.processHSV(img,True)
+
+        #get YCrBr mask
+        ycrbrm = self.processYCrBr(img, True)
+
+        #cobine masks
+        masks = cv2.bitwise_or(hsvm,ycrbrm)
+
+        # smooth the output
+        masks = cv2.medianBlur(masks, 23)
+
+        self.img = cv2.bitwise_and(img, img, mask=masks)
+
+        return self.img
+
 
 ###############################################################################
 #Provide easy access functions to create / save / load labels and training sets
