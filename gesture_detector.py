@@ -374,7 +374,7 @@ if __name__ == "__main__":
         # test cam instances
         if (cam0):
 
-            img = objPP.processHSV(img0)
+            img = objPP.CombineDetections(img0)
             img = objPP.processFilter(img)
             aa = cd.CotourFilter(img,500.0)
 
@@ -385,7 +385,7 @@ if __name__ == "__main__":
 
             val = det.ClassifyRoi(rois, SAMPLESIZE)
             if args.cal is 0:
-                img = cd.DrawDetections(img0, aa, 0, True, True, val)
+                img = cd.DrawDetections(img0, aa, 0, True, True, val,True)
             else:
                 img = ac.RunCalibration(img0)
 

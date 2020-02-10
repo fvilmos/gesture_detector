@@ -348,7 +348,7 @@ class ContourDetector():
                 id +=1
         return self.items
 
-    def DrawDetections(self, img, detections, offset =20, objCenter=True,objRectangle=True, label=[0,0]):
+    def DrawDetections(self, img, detections, offset =20, objCenter=True,objRectangle=True, label=[0,0], drawline=False):
         '''
         Draw detected contours on image
         :param img: input image
@@ -362,18 +362,25 @@ class ContourDetector():
         # copy image
         limg = cv2.copyMakeBorder(img, 0, 0, 0, 0, cv2.BORDER_REPLICATE)
 
+        arr = []
         # check if there are detections
         if len(detections) > 0:
             for ii,ll in zip(detections,label):
                 id, x, y, w, h, center = ii
-                if objCenter == True:
+                if objCenter:
                     cv2.circle(limg, center, 2, (0, 255, 0), -1)
-                if objRectangle == True:
+                if objRectangle:
                     cv2.rectangle(limg, (x-offset, y-offset), (x+w+offset, y+h+offset), (0, 255, 0), 1)
                     if ll[0] == id:
                         cv2.putText(limg, str(ll[1]), (x-offset+5, y-offset+15), self.font, 0.4, (0, 255, 0), 1, cv2.LINE_AA)
+                        arr.append(center)
+
+        arr = np.array(arr)
+        if len(arr)>2 and drawline == True:
+            cv2.drawContours(limg, [arr], 0, (255, 0, 255), 3)
 
         return limg
+
 
     def GetRoiForDetections(self, img, detections, offset=20, roi_size=(96, 96)):
         '''
