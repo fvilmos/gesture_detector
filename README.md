@@ -55,7 +55,7 @@ The flow of the detection and classifications, starts with low level filtering (
 </h1>
 </table>
 
-After createing a sufficiently big database ~100 pictures / class, the SVM training can start. Will take only a few secounds and a xml file will be saved which holds everrything needed for further detections.
+After creating a sufficiently big database ~100 pictures/class, the SVM training can start. It Will take only a few seconds and an xml file will be saved which holds everything needed for further detections.
 
 
 ## Usage
@@ -88,14 +88,14 @@ optional arguments:
 ```
 ### Retrain
 ```
-1. Create directory structure to store the files
+1. Create a directory structure to store the files
 2. Create labels file
 3. Capture and copy files under the desired folders
-4. Instruct software for retrain
+4. Instruct software for retraining
 ```
-#### 1. Create directory structure
+#### 1. Create a directory structure
 
-Is recommandet to start from the root of the python file, and create a directory like "data", than create under this folder directories equivalent to the classes what are needed for the classification part. Similar than below.
+Is recommended to start from the root of the python file, and create a directory like "data", then create under these folder directories equivalent to the classes that are needed for the classification part. Similar to below.
 ```
 ├── data
 │   ├── 0
@@ -113,7 +113,7 @@ Is recommandet to start from the root of the python file, and create a directory
 ```
 #### 2. Create labels file
 
-The tool itself provide means for saving image regions, this is fitting to the needs. First we need the label file, then the rest is easy.
+The tool itself provides means for saving image regions, this is fitting to the needs. First, we need the label file, then the rest is easy.
 ```
 python3 ./gesture_detector.py -l ./labels.txt -cmd creatlabelfile -dir ./data
 ```
@@ -133,7 +133,7 @@ Now, label file was created, contect is somethng like this:
 11,3,/home/test/data/3
 ```
 
-Unneeded directoryes like "tmp" - used to store temporary images, can be commented, the label loader will skip it. The format is simple, first element is the UID (unique identifier), label name - edit it to whatever want to show on detections. Last is the directory for the specific label.
+Unneeded directories like "tmp" - used to store temporary images, can be commented on, the label loader will skip it. The format is simple, the first element is the UID (unique identifier), label name - edit it to whatever wants to show on detections. Last is the directory for the specific label.
 
 #### 3. Capture and copy files under the desired folders
 
@@ -141,32 +141,32 @@ Use the following command to save images into a temp directory:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t -dd ./data/tmp -sf 1 -sp 1
 ```
-This will capture regions for detection, and the frames on which the regions were detected. If just patches are needed use just -sp 1 command.
-Now, comes the hard work of selectiong and coping the specific image patches under the desired directorys.
+This will capture regions for detection and the frames on which the regions were detected. If just patches are needed use just -sp 1 command.
+Now, comes the hard work of selecting and copying the specific image patches under the desired directories.
 
-#### 4. Instruct software for retrain
+#### 4. Instruct software for retraining
 
 Use the following command for retrain:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml -cmd retrain
 ```
-When everithing has gone well with the re-train, the software starts automatically. The data.xml will be automatically saved, threfore for nex run only:
+When everything has gone well with the re-train, the software starts automatically. The data.xml will be automatically saved, therefore for next run only:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t ./data.xml
 ```
 
-### Tweeking the object detector
+### Tweaking the object detector
 
-Detection performace is mainly driven by the color filterer. Different skin tones or even changing the object traced, can be easily setted, in the folowing code section:
+Detection performance is mainly driven by the color filterer. Different skin tones or even changing the object traced can be easily set, in the following code section:
 ```
 # pre-processing
 objPP = clPreProcessing(img0, False, 155, 30, 100)
 ```
-There is a simple tool to obtain desired color, [try this out](https://github.com/fvilmos/color_filterer).
+There is a simple tool to obtain the desired color, [try this out](https://github.com/fvilmos/color_filterer).
 
 ### (Re) Calibrate
 
-In some cases skeen color detector does not provide consistent detection. Re- calibration could be the solution. Values are stored in the labels file. Tustart the calibration process invoke the pithon file with the following arguments:
+In some cases, a skin color detector does not provide consistent detection. Recalibration could be the solution. Values are stored in the labels file. To start the calibration process invokes the python file with the following arguments:
 ```
 python3 ./gesture_detector.py -l ./labels.txt -t data.xml -cal 1
 
@@ -181,12 +181,12 @@ A small calibration window will appear, the object with the desired color to be 
 </tr>
 </h1>
 </table>
-If all vent good, the new values are stored in labels file, and the application will close automatically.
+If all went well, the new values are stored in the labels file, and the application will close automatically.
 
 
 ### Future work
 
-Implement validation funtion and detection accuracy for fine tunings.
+Implement validation function and detection accuracy for fine tunings.
 
 ## Resources
 
